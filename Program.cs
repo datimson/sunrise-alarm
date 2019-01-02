@@ -1,5 +1,6 @@
 ﻿using System;
-using Windows.Devices.Gpio;
+using System.Device.Gpio;
+using System.Threading;
 
 namespace sunrise_alarm
 {
@@ -9,26 +10,40 @@ namespace sunrise_alarm
         {
             Console.WriteLine("Hello Sunrise!");
 
-            var gpio = GpioController.GetDefault();
-
-            // Show an error if there is no GPIO controller
-            if (gpio == null)
-            {
-                pin = null;
-                GpioStatus.Text = "There is no GPIO controller on this device.";
-                return;
-            }
             var red = 14;
             var blue = 15;
             var green = 18;
-            pin = gpio.OpenPin(14);
-            pin.SetDriveMode(GpioPinDriveMode.Output);
-            pinValue = GpioPinValue.High;
-            pin.Write(pinValue);
+            var lightTimeInMilliseconds = 2000;
 
-            Console.ReadLine();
-            pinValue = GpioPinValue.Low;
-            pin.Write();
+            using (GpioController controller = new GpioController(PinNumberingScheme.Logical))
+            {
+                Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs eventArgs) =>
+                {
+                    controller.Dispose();
+                    Console.WriteLine("Pin cleanup complete!");
+                };
+
+                controller.OpenPin(red, PinMode.Output);
+                controller.OpenPin(green, PinMode.Output);
+                controller.OpenPin(blue, PinMode.Output);
+
+                for (int i = 0; i < 5; i++)
+                {
+                    controller.Write(red, PinValue.High);
+                    controller.Write(green, PinValue.High);
+                    controller.Write(blue, PinValue.High);
+                    Console.WriteLine("High");
+
+                    Thread.Sleep(lightTimeInMilliseconds);
+
+                    controller.Write(red, PinValue.Low);
+                    controller.Write(green, PinValue.Low);
+                    controller.Write(blue, PinValue.Low);
+                    Console.WriteLine("Low");
+                }
+            }
+            
+            Console.WriteLine("Done");
         }
     }
 }
