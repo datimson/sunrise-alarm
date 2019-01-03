@@ -11,7 +11,7 @@ COPY . ./
 RUN dotnet publish -c Release -o out -r linux-arm
 ENTRYPOINT ["dotnet", "out/sunrise-alarm.dll"]
 
-FROM microsoft/dotnet:3.0-runtime-stretch-slim
+FROM microsoft/dotnet:3.0-runtime-stretch-slim-arm32v7
 
 WORKDIR /app
 COPY --from=builder /app/out .
