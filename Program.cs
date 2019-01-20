@@ -13,7 +13,7 @@ namespace sunrise_alarm
             var red = 14;
             var blue = 15;
             var green = 18;
-            var lightTimeInMilliseconds = 2000;
+            var lightTimeInMilliseconds = 1000;
 
             using (GpioController controller = new GpioController(PinNumberingScheme.Logical))
             {
@@ -40,6 +40,9 @@ namespace sunrise_alarm
                     controller.Write(green, PinValue.Low);
                     controller.Write(blue, PinValue.Low);
                     Console.WriteLine("Low");
+
+                    Thread.Sleep(lightTimeInMilliseconds);
+
                 }
             }
             
